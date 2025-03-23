@@ -1,0 +1,80 @@
+# System Monitoring Setup 
+
+## Step 1: Install Monitoring Tools
+sudo apt update
+sudo apt install htop nmon -y
+
+## Step 2:
+htop  # Run htop to monitor CPU and memory
+nmon  # Run nmon to monitor system performance
+df -h  # Check disk usage
+### Output terminal of df -h
+
+root@e409703:~/batch10/devops-assignment# df -h
+Filesystem      Size  Used Avail Use% Mounted on
+none            1.9G     0  1.9G   0% /usr/lib/modules/5.15.167.4-microsoft-standard-WSL2
+none            1.9G  4.0K  1.9G   1% /mnt/wsl
+drivers         173G  165G  7.9G  96% /usr/lib/wsl/drivers
+/dev/sdc        251G  1.4G  237G   1% /
+none            1.9G   88K  1.9G   1% /mnt/wslg
+none            1.9G     0  1.9G   0% /usr/lib/wsl/lib
+rootfs          1.9G  2.4M  1.9G   1% /init
+none            1.9G  500K  1.9G   1% /run
+none            1.9G     0  1.9G   0% /run/lock
+none            1.9G     0  1.9G   0% /run/shm
+tmpfs           4.0M     0  4.0M   0% /sys/fs/cgroup
+none            1.9G   76K  1.9G   1% /mnt/wslg/versions.txt
+none            1.9G   76K  1.9G   1% /mnt/wslg/doc
+C:\             173G  165G  7.9G  96% /mnt/c
+D:\             293G   91G  203G  31% /mnt/d
+E:\             444G   27G  417G   7% /mnt/e
+F:\             489G   17G  473G   4% /mnt/f
+
+du -sh /var/log  # Check log directory size
+### Output terminal of du -sh /var/log  # Check log directory size
+root@e409703:~/batch10/devops-assignment# du -sh /var/www/html
+8.0K    /var/www/html
+
+
+## Step 3: Set Up System Metrics Logging Every 5 Minutes
+sudo touch /var/log/system_monitor.log
+sudo chmod 666 /var/log/system_monitor.log
+crontab -e
+
+# Add the following line to log system metrics every 5 minutes:
+*/5 * * * * (date; free -m; df -h; ps aux --sort=-%cpu | head -5) >> /var/log/system_monitor.log 2>&1
+
+## Step 4: Verify Logs
+cat /var/log/system_monitor.log
+
+###output 
+root@e409703:~/batch10/devops-assignment# cat /var/log/system_monitor.log
+Sun Mar 23 20:06:56 IST 2025
+               total        used        free      shared  buff/cache   available
+Mem:            3858         397        3255           3         204        3243
+Swap:           1024           0        1024
+Filesystem      Size  Used Avail Use% Mounted on
+none            1.9G     0  1.9G   0% /usr/lib/modules/5.15.167.4-microsoft-standard-WSL2
+none            1.9G  4.0K  1.9G   1% /mnt/wsl
+drivers         173G  165G  7.9G  96% /usr/lib/wsl/drivers
+/dev/sdc        251G  1.4G  237G   1% /
+none            1.9G   92K  1.9G   1% /mnt/wslg
+none            1.9G     0  1.9G   0% /usr/lib/wsl/lib
+rootfs          1.9G  2.4M  1.9G   1% /init
+none            1.9G  500K  1.9G   1% /run
+none            1.9G     0  1.9G   0% /run/lock
+none            1.9G     0  1.9G   0% /run/shm
+tmpfs           4.0M     0  4.0M   0% /sys/fs/cgroup
+none            1.9G   76K  1.9G   1% /mnt/wslg/versions.txt
+none            1.9G   76K  1.9G   1% /mnt/wslg/doc
+C:\             173G  165G  7.9G  96% /mnt/c
+D:\             293G   91G  203G  31% /mnt/d
+E:\             444G   27G  417G   7% /mnt/e
+F:\             489G   17G  473G   4% /mnt/f
+USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root           1  0.0  0.2 165804 11092 ?        Ss   18:41   0:04 /lib/systemd/systemd --system --deserialize 29
+root           2  0.0  0.0   2776  1924 ?        Sl   18:41   0:00 /init
+root           9  0.0  0.0   2776    68 ?        Sl   18:41   0:00 plan9 --control-socket 7 --log-level 4 --server-fd 8 --pipe-fd 10 --log-truncate
+root          65  0.0  0.2  31344 11420 ?        S<s  18:41   0:01 /lib/systemd/systemd-journald
+
+
