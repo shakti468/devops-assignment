@@ -207,6 +207,131 @@ ls -ld /home/mike/workspace
 
 ---
 
+# **Task 3: Backup Configuration for Web Servers**
+
+## **Objective**
+To configure automated backups for Sarah’s Apache server and Mike’s Nginx server, ensuring data integrity and disaster recovery readiness.
+
+---
+
+## **1. Steps to Implement**
+
+### **Step 1: Create Backup Directory**
+```bash
+sudo mkdir -p /backups
+sudo chmod 700 /backups
+```
+
+### **Step 2: Create Backup Scripts**
+#### **For Sarah’s Apache Backup:**
+```bash
+sudo nano /usr/local/bin/apache_backup.sh
+```
+**Add the following:**
+```bash
+#!/bin/bash
+DATE=$(date +'%Y-%m-%d')
+tar -czf /backups/apache_backup_$DATE.tar.gz /etc/httpd/ /var/www/html/
+```
+Save and exit, then make the script executable:
+```bash
+sudo chmod +x /usr/local/bin/apache_backup.sh
+```
+
+#### **For Mike’s Nginx Backup:**
+```bash
+sudo nano /usr/local/bin/nginx_backup.sh
+```
+**Add the following:**
+```bash
+#!/bin/bash
+DATE=$(date +'%Y-%m-%d')
+tar -czf /backups/nginx_backup_$DATE.tar.gz /etc/nginx/ /usr/share/nginx/html/
+```
+Save and exit, then make the script executable:
+```bash
+sudo chmod +x /usr/local/bin/nginx_backup.sh
+```
+
+### **Step 3: Schedule Cron Jobs**
+Edit the crontab:
+```bash
+crontab -e
+```
+Add the following lines to schedule backups every Tuesday at 12:00 AM:
+```bash
+0 0 * * 2 /usr/local/bin/apache_backup.sh
+0 0 * * 2 /usr/local/bin/nginx_backup.sh
+```
+
+### **Step 4: Verify Backup Creation**
+Manually trigger the backup scripts:
+```bash
+sudo /usr/local/bin/apache_backup.sh
+sudo /usr/local/bin/nginx_backup.sh
+```
+Check if backup files exist:
+```bash
+ls -lh /backups/
+```
+
+### **Step 5: Verify Backup Integrity**
+```bash
+tar -tzf /backups/apache_backup_$(date +'%Y-%m-%d').tar.gz
+tar -tzf /backups/nginx_backup_$(date +'%Y-%m-%d').tar.gz
+```
+
+### **Step 6: Generate Verification Logs**
+```bash
+tar -tzf /backups/apache_backup_$(date +'%Y-%m-%d').tar.gz > /backups/apache_backup_log.txt
+tar -tzf /backups/nginx_backup_$(date +'%Y-%m-%d').tar.gz > /backups/nginx_backup_log.txt
+```
+
+---
+
+## **2. Expected Output**
+
+### **✅ Cron Job Configuration**
+```bash
+crontab -l
+```
+*Expected Output:*
+```
+0 0 * * 2 /usr/local/bin/apache_backup.sh
+0 0 * * 2 /usr/local/bin/nginx_backup.sh
+```
+
+### **✅ Backup Files in `/backups/`**
+```bash
+ls -lh /backups/
+```
+*Expected Output:*
+```
+-rw-r--r-- 1 root root 2.5M Mar 22 00:00 apache_backup_2025-03-22.tar.gz
+-rw-r--r-- 1 root root 3.1M Mar 22 00:00 nginx_backup_2025-03-22.tar.gz
+```
+
+### **✅ Backup Integrity Verification**
+```bash
+tar -tzf /backups/apache_backup_$(date +'%Y-%m-%d').tar.gz
+tar -tzf /backups/nginx_backup_$(date +'%Y-%m-%d').tar.gz
+```
+
+### **✅ Screenshot of Terminal Outputs**
+![image](https://github.com/user-attachments/assets/db23160b-0338-4625-8b0f-1fead6f9c6e6)
+![image](https://github.com/user-attachments/assets/1d94a018-d7e7-4641-9c6a-61f6515a5970)
+![image](https://github.com/user-attachments/assets/54a1d4dc-c88d-48ee-9457-dbbc0ea641e6)
+
+
+
+
+
+---
+
+
+
+
+
 
 
 
